@@ -11,7 +11,20 @@
 	$: scale = convertRange(offsetPercentage, -66, 3, 1, 4);
 	$: xBox = 5 - convertRange(offsetPercentage, -33, 3, -5, 5);
 	$: yBox = convertRange(offsetPercentage, -66, -33, -5, 5);
+
+	let yo = false;
 </script>
+
+<div class="m-10">
+	<button on:click={() => (yo = !yo)}>COLOR CHANGE</button>
+	<div
+		class="h-20 w-20 transition-all duration-1000 transform-gpu"
+		class:bg-red-500={yo}
+		class:bg-green-500={!yo}
+		class:scale-100={yo}
+		class:scale-150={!yo}
+	/>
+</div>
 
 <div class="p-6 flex justify-center bg-blue-50">
 	<SetInterval />
