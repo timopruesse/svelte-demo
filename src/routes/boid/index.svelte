@@ -68,6 +68,7 @@
 	let physicsTick = 0;
 	function doUpdate(delta: number) {
 		moveBodies();
+
 		physicsTick = delta;
 	}
 
