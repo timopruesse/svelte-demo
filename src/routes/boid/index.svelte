@@ -2,6 +2,7 @@
 	import { browser } from '$app/env';
 	import { onDestroy, onMount } from 'svelte';
 	import { createRandomBody, reverseDirection, type CanvasBody } from '$lib/boid/body';
+	import Render from '$lib/boid/render.svelte';
 
 	let canvasElement: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D | null;
@@ -14,13 +15,7 @@
 	let numBodies = 10;
 	let bodies: CanvasBody[] = [];
 
-	let drawFrame: number;
 	let physicsFrame: number;
-
-	function nextDraw() {
-		drawBodies();
-		drawFrame = requestAnimationFrame(nextDraw);
-	}
 
 	function nextPhysics() {
 		moveBodies();
@@ -46,13 +41,11 @@
 
 		setCanvasSize();
 
-		drawFrame = requestAnimationFrame(nextDraw);
 		physicsFrame = requestAnimationFrame(nextPhysics);
 	});
 
 	onDestroy(() => {
 		if (browser) {
-			cancelAnimationFrame(drawFrame);
 			cancelAnimationFrame(physicsFrame);
 		}
 	});
@@ -90,6 +83,8 @@
 	function moveBodies() {
 		bodies.forEach(moveBody);
 	}
+
+	let fps = 0;
 </script>
 
 <div class="w-full h-screen">
@@ -100,5 +95,10 @@
 		bind:value={numBodies}
 		class="absolute top-6 left-6 z-50 w-20 text-center"
 	/>
+
+	<div class="absolute right-6 top-6 font-mono text-xl font-bold">{fps} fps</div>
+
 	<canvas bind:this={canvasElement} class="w-full h-full bg-blue-500" on:resize={setCanvasSize} />
+
+	<Render draw={drawBodies} on:fps={(e) => (fps = e.detail)} />
 </div>
