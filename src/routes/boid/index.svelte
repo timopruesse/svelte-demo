@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { browser } from '$app/env';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { createRandomBody, reverseDirection, type CanvasBody } from '$lib/boid/body';
 	import Render from '$lib/boid/render.svelte';
+	import Physics from '$lib/boid/physics.svelte';
+	import Hud from '$lib/boid/hud.svelte';
 
 	let canvasElement: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D | null;
@@ -14,13 +15,6 @@
 
 	let numBodies = 10;
 	let bodies: CanvasBody[] = [];
-
-	let physicsFrame: number;
-
-	function nextPhysics() {
-		moveBodies();
-		physicsFrame = requestAnimationFrame(nextPhysics);
-	}
 
 	$: if (canvasElement) {
 		if (bodies.length <= numBodies) {
@@ -34,20 +28,7 @@
 
 	onMount(() => {
 		ctx = canvasElement.getContext('2d');
-
-		if (!ctx) {
-			throw new Error('Could not get 2D context.');
-		}
-
 		setCanvasSize();
-
-		physicsFrame = requestAnimationFrame(nextPhysics);
-	});
-
-	onDestroy(() => {
-		if (browser) {
-			cancelAnimationFrame(physicsFrame);
-		}
 	});
 
 	function drawBody({ x, y, radius, color }: CanvasBody) {
@@ -84,10 +65,16 @@
 		bodies.forEach(moveBody);
 	}
 
+	let physicsTick = 0;
+	function doUpdate(delta: number) {
+		moveBodies();
+		physicsTick = delta;
+	}
+
 	let fps = 0;
 </script>
 
-<div class="w-full h-screen">
+<div class="w-full h-screen relative">
 	<input
 		min="1"
 		type="number"
@@ -96,9 +83,10 @@
 		class="absolute top-6 left-6 z-50 w-20 text-center"
 	/>
 
-	<div class="absolute right-6 top-6 font-mono text-xl font-bold">{fps} fps</div>
+	<Hud {fps} {physicsTick} />
 
-	<canvas bind:this={canvasElement} class="w-full h-full bg-blue-500" on:resize={setCanvasSize} />
+	<canvas bind:this={canvasElement} class="w-full h-full bg-blue-300" on:resize={setCanvasSize} />
 
 	<Render draw={drawBodies} on:fps={(e) => (fps = e.detail)} />
+	<Physics update={doUpdate} />
 </div>
