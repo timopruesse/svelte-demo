@@ -16,6 +16,6 @@
 		class:text-orange-500={physicsTick >= 17 && physicsTick < 32}
 		class:text-red-500={physicsTick >= 32}
 	>
-		{physicsTick.toFixed(2)} ms
+		{physicsTick.toFixed(1)} ms
 	</div>
 </div>

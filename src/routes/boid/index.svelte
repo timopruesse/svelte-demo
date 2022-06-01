@@ -18,7 +18,7 @@
 
 	$: if (canvasElement) {
 		if (bodies.length <= numBodies) {
-			for (let i = bodies.length; i <= numBodies; i++) {
+			for (let i = bodies.length; i < numBodies; i++) {
 				bodies.push(createRandomBody(canvasElement.width, canvasElement.height));
 			}
 		} else {
